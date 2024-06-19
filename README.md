@@ -21,7 +21,7 @@ public class Program
     }
 }
 
-public class Pessoas : Entity, IEnity
+public class Pessoas : Entity, IEntity
 {
    public override long Id { get; set; } // Chave primária da entidade
    public override string Name { get => "Pessoas"; } // Nome da entidade no banco de dados
