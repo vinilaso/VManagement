@@ -29,7 +29,7 @@ namespace VManagement.Database
         /// <summary>
         /// Cláusula Order By da consulta
         /// </summary>
-        public string SortClause {  get; set; } = string.Empty;
+        public string SortClause { get; set; } = string.Empty;
         /// <summary>
         /// Retorna um objeto do tipo Microsoft.Data.SqlClient.SqlCommand com o comando INSERT baseado no campo Entity
         /// </summary>
@@ -116,7 +116,7 @@ namespace VManagement.Database
 
             _builder.Clear();
 
-            _builder.Append("SELECT ");
+            _builder.Append("SELECT ID, ");
 
             foreach (var field in Entity.Fields)
             {
@@ -132,14 +132,14 @@ namespace VManagement.Database
                 _builder.Append(" WHERE ");
                 _builder.Append(WhereClause);
             }
-            
+
             if (!string.IsNullOrEmpty(SortClause))
             {
                 _builder.Append(" ORDER BY ");
                 _builder.Append(SortClause);
             }
-            
-            result.CommandText= _builder.ToString();
+
+            result.CommandText = _builder.ToString();
 
             return result;
         }

@@ -10,17 +10,39 @@ namespace VManagement.Core.Entities
 {
     public class Entity : IEntity
     {
-        public virtual long Id { get; set; }
+        private long _id { get; set; }
+        public virtual long Id
+        {
+            get
+            {
+                return _id;
+            }
+            set
+            {
+                _id = value;
+                var entity = _entityDAO.GetOne($"ID = {_id}");
+
+                if (entity != null) Fields = entity.Fields;
+            }
+        }
         public virtual string Name { get; } = string.Empty;
-        public virtual Dictionary<string, object?> Fields { get; } = new Dictionary<string, object?>();
+        public virtual Dictionary<string, object?> Fields { get; set; } = new Dictionary<string, object?>();
         private EntityDAO _entityDAO => new EntityDAO(this);
 
-        public void Delete(string whereClause)
+        public Entity() { }
+
+        private Entity(IEntity mock)
+        {
+            Name = mock.Name;
+            Id = mock.Id;
+        }
+
+        public void Delete()
         {
             _entityDAO.Delete();
         }
 
-        public virtual IEntity Save()
+        public IEntity Save()
         {
             _entityDAO.Insert();
             return this;
@@ -40,7 +62,7 @@ namespace VManagement.Core.Entities
 
         public virtual IEntity GetOne(string whereClause)
         {
-            IEntity result = _entityDAO.GetOne(whereClause);
+            Entity result = new(_entityDAO.GetOne(whereClause));
             return result;
         }
 

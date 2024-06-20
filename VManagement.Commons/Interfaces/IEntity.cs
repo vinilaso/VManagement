@@ -34,7 +34,7 @@ namespace VManagement.Commons.Interfaces
         /// Remove a entidade do banco de dados.
         /// </summary>
         /// <param name="whereClause">Cláusula Where da consulta.</param>
-        public void Delete(string whereClause);
+        public void Delete();
         /// <summary>
         /// Atualiza a entidade no banco de dados.
         /// </summary>

@@ -19,95 +19,149 @@ namespace VManagement.Database
 
         public void Insert()
         {
-            SqlBuilder sqlBuilder = new SqlBuilder(Entity);
-
             using var conn = Security.GetDatabaseConnection();
-            conn.Open();
-            var cmd = sqlBuilder.InsertClause;
-            cmd.Connection = conn;
 
-            cmd.ExecuteNonQuery();
+            try
+            {
+                SqlBuilder sqlBuilder = new SqlBuilder(Entity);
+
+                conn.Open();
+                var cmd = sqlBuilder.InsertClause;
+                cmd.Connection = conn;
+
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                conn.Close();
+            }
+
         }
 
         public void Update()
         {
-            SqlBuilder sqlBuilder = new SqlBuilder(Entity);
-
             using var conn = Security.GetDatabaseConnection();
-            conn.Open();
-            var cmd = sqlBuilder.UpdateClause;
-            cmd.Connection = conn;
 
-            cmd.ExecuteNonQuery();
+            try
+            {
+                SqlBuilder sqlBuilder = new SqlBuilder(Entity);
+
+                conn.Open();
+                var cmd = sqlBuilder.UpdateClause;
+                cmd.Connection = conn;
+
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                conn.Close();
+            }
         }
 
         public void Delete()
         {
-            SqlBuilder sqlBuilder = new SqlBuilder(Entity);
-
             using var conn = Security.GetDatabaseConnection();
-            conn.Open();
-            var cmd = sqlBuilder.DeleteClause;
-            cmd.Connection = conn;
 
-            cmd.ExecuteNonQuery();
+            try
+            {
+                SqlBuilder sqlBuilder = new SqlBuilder(Entity);
+
+                conn.Open();
+                var cmd = sqlBuilder.DeleteClause;
+                cmd.Connection = conn;
+
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                conn.Close();
+            }
+
         }
 
         public IEnumerable<IEntity> GetAll(string whereClause, string sortClause)
         {
-            List<EntityMock> entities = new List<EntityMock>();
-
-            SqlBuilder sqlBuilder = new SqlBuilder(Entity)
-            {
-                WhereClause = whereClause,
-                SortClause = sortClause
-            };
-
             using var conn = Security.GetDatabaseConnection();
-            conn.Open();
-            var cmd = sqlBuilder.SelectClause;
-            cmd.Connection = conn;
 
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            try
             {
-                entities.Add(EntityMock.CreateFromReader(reader));
+                List<EntityMock> entities = new List<EntityMock>();
+
+                SqlBuilder sqlBuilder = new SqlBuilder(Entity)
+                {
+                    WhereClause = whereClause,
+                    SortClause = sortClause
+                };
+
+
+                conn.Open();
+                var cmd = sqlBuilder.SelectClause;
+                cmd.Connection = conn;
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    entities.Add(EntityMock.CreateFromReader(reader, Entity.Name));
+                }
+
+                return entities;
+            }
+            finally
+            {
+                conn.Close();
             }
 
-            return entities;
         }
 
         public IEntity GetOne(string whereClause)
         {
-            EntityMock mock = new EntityMock();
-
-            SqlBuilder sqlBuilder = new SqlBuilder(Entity)
-            {
-                WhereClause = whereClause
-            };
-
             using var conn = Security.GetDatabaseConnection();
-            conn.Open();
-            var cmd = sqlBuilder.SelectClause;
-            cmd.Connection = conn;
 
-            using var reader = cmd.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                mock = EntityMock.CreateFromReader(reader);
-            }
+                EntityMock mock = new EntityMock();
 
-            return mock;
+                SqlBuilder sqlBuilder = new SqlBuilder(Entity)
+                {
+                    WhereClause = whereClause
+                };
+
+
+                conn.Open();
+                var cmd = sqlBuilder.SelectClause;
+                cmd.Connection = conn;
+
+                using var reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    mock = EntityMock.CreateFromReader(reader, Entity.Name);
+                }
+
+                return mock;
+            }
+            finally
+            {
+                conn.Close();
+            }
         }
 
         public static void Execute(string command)
         {
             using var conn = Security.GetDatabaseConnection();
-            conn.Open();
-            var cmd = conn.CreateCommand();
-            cmd.CommandText = command;
 
-            cmd.ExecuteNonQuery();
+            try
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = command;
+
+                cmd.ExecuteNonQuery();
+
+            }
+            finally
+            {
+                conn.Close();
+            }
         }
 
         /// <summary>
@@ -121,19 +175,23 @@ namespace VManagement.Database
 
             public EntityMock() { }
 
-            public static EntityMock CreateFromReader(SqlDataReader reader)
+            public static EntityMock CreateFromReader(SqlDataReader reader, string tableName)
             {
                 EntityMock mock = new EntityMock();
+                mock.Name = tableName;
 
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
-                    mock.Fields.Add(reader.GetName(i), reader.GetValue(i));
+                    if (reader.GetName(i) == "ID")
+                        mock.Id = reader.GetInt32(i);
+                    else
+                        mock.Fields.Add(reader.GetName(i), reader.GetValue(i));
                 }
 
                 return mock;
             }
 
-            public void Delete(string whereClause)
+            public void Delete()
             {
                 throw new NotImplementedException();
             }
