@@ -20,7 +20,7 @@ namespace VManagement.Core.Entities
             set
             {
                 _id = value;
-                var entity = _entityDAO.GetOne($"ID = {_id}");
+                var entity = _entityDAO.GetOne($"ID = {value}");
 
                 if (entity != null) Fields = entity.Fields;
             }
@@ -35,14 +35,15 @@ namespace VManagement.Core.Entities
         {
             Name = mock.Name;
             Id = mock.Id;
+            Fields = mock.Fields;
         }
 
-        public void Delete()
+        public virtual void Delete()
         {
             _entityDAO.Delete();
         }
 
-        public IEntity Save()
+        public virtual IEntity Save()
         {
             _entityDAO.Insert();
             return this;
