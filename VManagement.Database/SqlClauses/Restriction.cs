@@ -17,7 +17,7 @@ namespace VManagement.Database.SqlClauses
         public string WhereClause { get; set; } = string.Empty;
         public string GroupClause { get; set; } = string.Empty;
 
-        public Restriction() { }
+        internal Restriction() { }
         public Restriction(string whereClause)
         {
             this.AddWhere(whereClause);
@@ -27,7 +27,7 @@ namespace VManagement.Database.SqlClauses
         {
             var sb = new DelimitedStringBuilder(" ");
 
-            if (string.IsNullOrEmpty(whereClause))
+            if (string.IsNullOrEmpty(WhereClause))
                 sb.Append("WHERE");
             else
                 sb.Append("AND");

@@ -7,4 +7,9 @@
     <BaseOutputPath>C:\VManagement\Bin</BaseOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\VManagement.Commons\VManagement.Commons.csproj" />
+    <ProjectReference Include="..\VManagement.Database\VManagement.Database.csproj" />
+  </ItemGroup>
+
 </Project>

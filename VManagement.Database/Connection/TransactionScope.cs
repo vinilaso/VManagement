@@ -19,6 +19,9 @@ namespace VManagement.Database.Connection
         private readonly SqlTransaction _transaction;
         private bool _commited = false;
 
+        /// <summary>
+        /// The current transaction in progress.
+        /// </summary>
         public static TransactionScope? Current => _current.Value;
         public VManagementConnection Connection => _connection;
         public SqlTransaction Transaction => _transaction;
@@ -27,11 +30,11 @@ namespace VManagement.Database.Connection
 
         public TransactionScope()
         {
+            Security.InTransaction = true;
             _connection = new VManagementConnection();
             _transaction = _connection.Connection.BeginTransaction();
 
             _current.Value = this;
-            Security.InTransaction = true;
         }
 
         public void Complete()
