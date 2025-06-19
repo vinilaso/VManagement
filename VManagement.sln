@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VManagement.Commons", "VMan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VManagement.Core", "VManagement.Core\VManagement.Core.csproj", "{E4134E78-F97E-4A93-874F-06A2D945E88E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VManagement.Console", "VManagement.Console\VManagement.Console.csproj", "{3E16B571-90DC-4C74-9023-F24FE6C61A93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VManagement.Console", "VManagement.Console\VManagement.Console.csproj", "{3E16B571-90DC-4C74-9023-F24FE6C61A93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

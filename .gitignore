@@ -362,3 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /VManagement.Console/VManagement.Console.csproj
+/VManagement.Console/Program.cs
+/VManagement.TestingAnalyzers/VManagement.TestingAnalyzers.csproj
+/VManagement.TestingAnalyzers/Class1.cs

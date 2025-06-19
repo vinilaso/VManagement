@@ -1,6 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using VManagement.Commons.Entities;
 using VManagement.Database.Clauses;
+using VManagement.Database.Connection;
+using VManagement.Database.Entities;
 using static VManagement.Database.Commands.CommandConstants;
 
 [assembly: InternalsVisibleTo("VManagement.Database.Tests")]
@@ -9,6 +11,7 @@ namespace VManagement.Database.Commands
     internal class CommandBuilder
     {
         private const string ALIAS = "A";
+        private readonly VManagementConnection? _connection;
         private readonly CoreEntity _entity;
         private readonly Restriction _restriction = Restriction.Empty;
 
@@ -22,8 +25,15 @@ namespace VManagement.Database.Commands
             _entity = entity;
             _restriction = restriction;
         }
+        
+        internal CommandBuilder(CoreEntity entity, Restriction restriction, VManagementConnection connection)
+        {
+            _entity = entity;
+            _restriction = restriction;
+            _connection = connection;
+        }
 
-        internal string BuildSelectClause()
+        internal VManagementCommand BuildSelectCommand()
         {
             if (_entity == null)
                 throw new ArgumentNullException(nameof(_entity));
@@ -33,10 +43,19 @@ namespace VManagement.Database.Commands
 
             string fieldsToRetrieve = string.Join(",", _entity.Fields.Select(field => field.WithAlias(ALIAS)));
 
-            return string.Format(SELECT_LAYOUT, fieldsToRetrieve, $"{_entity.Schema.EntityName} {ALIAS}", _restriction);
+            if (_connection == null)
+                throw new ArgumentNullException(nameof(_connection));
+
+            VManagementCommand command = _connection.CreateCommand();
+            command.CommandText = string.Format(SELECT_LAYOUT, fieldsToRetrieve, $"{_entity.Schema.EntityName} {ALIAS}", _restriction);
+
+            if (_restriction != null)
+                command.SetParameters(_restriction.Parameters);
+
+            return command;
         }
 
-        internal string BuildUpdateClause()
+        internal VManagementCommand BuildUpdateCommand()
         {
             if (_entity == null)
                 throw new ArgumentNullException(nameof(_entity));
@@ -48,10 +67,20 @@ namespace VManagement.Database.Commands
                 .Where(field => field.Name != "ID")
                 .Select(field => $"{field.Name} = @{field.Name}"));
 
-            return string.Format(UPDATE_LAYOUT, $"{_entity.Schema.EntityName}", fieldsToUpdate, _restriction);
+            if (_connection == null)
+                throw new ArgumentNullException(nameof(_connection));
+
+            Restriction updateRestriction = Restriction.FromId(_entity.Id, false);
+            VManagementCommand command = _connection.CreateCommand();
+
+            command.CommandText = string.Format(UPDATE_LAYOUT, _entity.Schema.EntityName, fieldsToUpdate, updateRestriction);
+            command.SetParameters(_entity);
+            command.SetParameters(updateRestriction.Parameters);
+
+            return command;
         }
 
-        internal string BuildInsertClause()
+        internal VManagementCommand BuildInsertCommand()
         {
             if (_entity == null)
                 throw new ArgumentNullException(nameof(_entity));
@@ -67,23 +96,45 @@ namespace VManagement.Database.Commands
                 .Where(field => field.Name != "ID")
                 .Select(field => $"@{field.Name}"));
 
-            return string.Format(INSERT_LAYOUT, _entity.Schema.EntityName, fieldsToInsert, valuesToInsert);
+            if (_connection == null)
+                throw new ArgumentNullException(nameof(_connection));
+
+            VManagementCommand command = _connection.CreateCommand();
+            command.CommandText = string.Format(INSERT_LAYOUT, _entity.Schema.EntityName, fieldsToInsert, valuesToInsert);
+            command.SetParameters(_entity);
+
+            return command;
         }
 
-        internal string BuildDeleteClause()
+        internal VManagementCommand BuildDeleteCommand()
         {
             if (_entity == null)
                 throw new ArgumentNullException(nameof(_entity));
 
-            return string.Format(DELETE_LAYOUT, $"{_entity.Schema.EntityName}", _restriction);
+            if (_connection == null)
+                throw new ArgumentNullException(nameof(_connection));
+
+            VManagementCommand command = _connection.CreateCommand();
+            Restriction deleteRestriction = Restriction.FromId(_entity.Id, false);
+            command.CommandText = string.Format(DELETE_LAYOUT, _entity.Schema.EntityName, deleteRestriction);
+            command.SetParameters(deleteRestriction.Parameters);
+
+            return command;
         }
 
-        internal string BuildExistsClause()
+        internal VManagementCommand BuildExistsCommand()
         {
             if (_entity == null)
                 throw new ArgumentNullException(nameof(_entity));
 
-            return string.Format(EXISTS_LAYOUT, $"{_entity.Schema.EntityName} {ALIAS}", _restriction);
+            if (_connection == null)
+                throw new ArgumentNullException(nameof(_connection));
+
+            VManagementCommand command = _connection.CreateCommand();
+            command.CommandText = string.Format(EXISTS_LAYOUT, $"{_entity.Schema.EntityName} {ALIAS}", _restriction);
+            command.SetParameters(_restriction.Parameters);
+
+            return command;
         }
 
         internal static string FormatQuery(string query, Restriction restriction)

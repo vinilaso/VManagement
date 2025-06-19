@@ -12,11 +12,9 @@ namespace VManagement.Database.Entities
         public static void Save(TEntity entity)
         {
             using VManagementConnection connection = new VManagementConnection();
-            var command = connection.CreateCommand();
 
-            CommandBuilder commandBuilder = new CommandBuilder(entity);
-            command.CommandText = commandBuilder.BuildInsertClause();
-            command.SetParameters(entity);
+            CommandBuilder commandBuilder = new(entity, Restriction.Empty, connection);
+            VManagementCommand command = commandBuilder.BuildInsertCommand();
 
             entity.Id = command.ExecuteScalar<long>();
         }
@@ -24,12 +22,9 @@ namespace VManagement.Database.Entities
         public static void Update(TEntity entity)
         {
             using VManagementConnection connection = new VManagementConnection();
-            var command = connection.CreateCommand();
 
-            CommandBuilder commandBuilder = new CommandBuilder(entity, Restriction.FromId(entity.Id, false));
-            command.CommandText = commandBuilder.BuildUpdateClause();
-            command.SetParameters(entity);
-            command.SetParameters(Restriction.FromId(entity.Id, false).Parameters);
+            CommandBuilder commandBuilder = new(entity, Restriction.Empty, connection);
+            VManagementCommand command = commandBuilder.BuildUpdateCommand();
 
             command.ExecuteNonQuery();
         }
@@ -37,11 +32,9 @@ namespace VManagement.Database.Entities
         public static void Delete(TEntity entity)
         {
             using VManagementConnection connection = new VManagementConnection();
-            var command = connection.CreateCommand();
 
-            CommandBuilder commandBuilder = new CommandBuilder(entity, Restriction.FromId(entity.Id, false));
-            command.CommandText = commandBuilder.BuildDeleteClause();
-            command.SetParameters(Restriction.FromId(entity.Id).Parameters);
+            CommandBuilder commandBuilder = new(entity, Restriction.Empty, connection);
+            VManagementCommand command = commandBuilder.BuildDeleteCommand();
 
             command.ExecuteNonQuery();
         }
@@ -56,11 +49,9 @@ namespace VManagement.Database.Entities
             CoreEntity model = CreateTypeInstance();
 
             using VManagementConnection connection = new VManagementConnection();
-            var command = connection.CreateCommand();
 
-            CommandBuilder commandBuilder = new CommandBuilder(model, restriction);
-            command.CommandText = commandBuilder.BuildSelectClause();
-            command.SetParameters(restriction.Parameters);
+            CommandBuilder commandBuilder = new(model, restriction, connection);
+            VManagementCommand command = commandBuilder.BuildSelectCommand();
 
             using SqlDataReader reader = command.ExecuteReader();
 
@@ -105,11 +96,9 @@ namespace VManagement.Database.Entities
             CoreEntity model = CreateTypeInstance();
 
             using VManagementConnection connection = new VManagementConnection();
-            var command = connection.CreateCommand();
 
-            CommandBuilder commandBuilder = new CommandBuilder(model, restriction);
-            command.CommandText = commandBuilder.BuildSelectClause();
-            command.SetParameters(restriction.Parameters);
+            CommandBuilder commandBuilder = new(model, restriction, connection);
+            VManagementCommand command = commandBuilder.BuildSelectCommand();
 
             using SqlDataReader reader = command.ExecuteReader();
 
@@ -130,11 +119,9 @@ namespace VManagement.Database.Entities
             CoreEntity model = CreateTypeInstance();
 
             using VManagementConnection connection = new VManagementConnection();
-            var command = connection.CreateCommand();
 
-            CommandBuilder commandBuilder = new CommandBuilder(model, restriction);
-            command.CommandText = commandBuilder.BuildSelectClause();
-            command.SetParameters(restriction.Parameters);
+            CommandBuilder commandBuilder = new(model, restriction, connection);
+            VManagementCommand command = commandBuilder.BuildSelectCommand();
 
             using SqlDataReader reader = command.ExecuteReader();
 
@@ -152,11 +139,9 @@ namespace VManagement.Database.Entities
             CoreEntity model = CreateTypeInstance();
 
             using VManagementConnection connection = new VManagementConnection();
-            var command = connection.CreateCommand();
 
-            CommandBuilder commandBuilder = new CommandBuilder(model, restriction);
-            command.CommandText = commandBuilder.BuildExistsClause();
-            command.SetParameters(restriction.Parameters);
+            CommandBuilder commandBuilder = new(model, restriction, connection);
+            VManagementCommand command = commandBuilder.BuildExistsCommand();
 
             return command.ExecuteScalar<int>() == 1;
         }
