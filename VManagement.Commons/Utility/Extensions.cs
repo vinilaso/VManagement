@@ -1,4 +1,6 @@
-﻿namespace VManagement.Commons.Utility
+﻿using System.Linq.Expressions;
+
+namespace VManagement.Commons.Utility
 {
     public static class Extensions
     {
@@ -17,6 +19,37 @@
             return !string.IsNullOrEmpty(text);
         }
 
+        public static bool In<T>(this T? obj, params T[] values)
+        {
+            if (obj == null)
+                return false;
+
+            foreach (T value in values)
+            {
+                if (value != null && obj.Equals(value))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static object? EvaluateValue(this Expression expression)
+        {
+            if (expression is ConstantExpression constantExpression)
+                return constantExpression.Value;
+
+            LambdaExpression lambda = Expression.Lambda(expression);
+            return lambda.Compile().DynamicInvoke();
+        }
+
+        public static string Capitalize(this string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            return string.Concat(text[0].ToString().ToUpper(), text.ToLower().AsSpan(1));
+        }
+
         #region [ Conversions ]
         public static string SafeToString(this object? value)
         {
@@ -31,6 +64,23 @@
             catch
             {
                 return string.Empty;
+            }
+        }
+
+        public static char ToChar(this object? value)
+        {
+            return Convert.ToChar(value);
+        }
+
+        public static char SafeToChar(this object? value)
+        {
+            try
+            {
+                return value.ToChar();
+            }
+            catch
+            {
+                return char.MinValue;
             }
         }
 

@@ -4,7 +4,7 @@ using VManagement.Database.Clauses;
 
 namespace VManagement.Database.Connection
 {
-    public class VManagementCommand
+    public sealed class VManagementCommand
     {
         public string CommandText
         {

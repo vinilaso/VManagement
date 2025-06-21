@@ -12,7 +12,14 @@ namespace VManagement.Database.Clauses
 
         public void Add(string parameterName, object? parameterValue)
         {
-            Add(new SqlParameter(parameterName, parameterValue ?? DBNull.Value));
+            SqlParameter parameter = new(parameterName, parameterValue ?? DBNull.Value);
+
+            if (parameterValue is string)
+            {
+                parameter.CompareInfo = System.Data.SqlTypes.SqlCompareOptions.None;
+            }
+
+            Add(parameter);
         }
 
         public void Add(string parameterName, bool parameterValue)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using VManagement.Commons.Utility;
 using VManagement.Database.Connection;
+using VManagement.Database.Metadata;
 
 namespace VManagement.Database
 {
@@ -26,6 +27,8 @@ namespace VManagement.Database
         {
             SetConnectionString(DefaultConnectionStringPath);
             SetInternalFilesPath("C:\\VManagementV2\\Files");
+
+            MetadataGenerator.Run();
         }
 
         public static bool TestConnection(out string error)
@@ -45,7 +48,7 @@ namespace VManagement.Database
             }
         }
 
-        internal static void SetInternalFilesPath(string internalFilesPath)
+        public static void SetInternalFilesPath(string internalFilesPath)
         {
             _internalFilesPath = internalFilesPath;
         }

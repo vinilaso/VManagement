@@ -10,7 +10,7 @@ namespace VManagement.Database.Entities
     {
         public static string GetEntityName()
         {
-            EntityName? nameAttribute = typeof(TEntity).GetCustomAttribute(typeof(EntityName)) as EntityName;
+            EntityNameAttribute? nameAttribute = typeof(TEntity).GetCustomAttribute(typeof(EntityNameAttribute)) as EntityNameAttribute;
 
             if (nameAttribute == null)
                 throw new OperationCanceledException($"The object {typeof(TEntity)} does not have the EntityName attribute implemented.");

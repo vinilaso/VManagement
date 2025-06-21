@@ -1,4 +1,5 @@
-﻿using VManagement.Commons.Interfaces;
+﻿using VManagement.Commons.Entities.Attributes;
+using VManagement.Commons.Interfaces;
 using VManagement.Commons.Utility;
 
 namespace VManagement.Commons.Entities
@@ -14,6 +15,7 @@ namespace VManagement.Commons.Entities
             Fields = new FieldCollection(this);
         }
 
+        [EntityColumnName("ID")]
         public long? Id
         {
             get => Fields["ID"].ToInt64();
