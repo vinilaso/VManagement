@@ -5,17 +5,20 @@ namespace VManagement.Database.Connection
     public sealed class VManagementConnection : IDisposable
     {
         private readonly SqlConnection _connection;
+        private readonly bool _ownsConnection;
 
         public VManagementConnection()
         {
-            if (Security.InTransaction)
+            if (TransactionScopeManager.Current != null)
             {
-                _connection = VManagementTransaction.CurrentConnection!;
+                _connection = TransactionScopeManager.Current.Connection;
+                _ownsConnection = false;
             }
             else
             {
                 _connection = new SqlConnection(Security.ConnectionString);
                 _connection.Open();
+                _ownsConnection = true;
             }
         }
 
@@ -26,15 +29,10 @@ namespace VManagement.Database.Connection
 
         public void Dispose()
         {
-            if (Security.InTransaction)
-                return;
-
-            if (_connection?.State == System.Data.ConnectionState.Open)
+            if (_ownsConnection)
             {
-                _connection?.Close();
+                _connection.Dispose();
             }
-
-            _connection?.Dispose();
         }
     }
 }

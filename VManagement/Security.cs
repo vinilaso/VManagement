@@ -9,7 +9,6 @@ namespace VManagement.Database
     {
         private static string _internalFilesPath = string.Empty;
 
-        public static bool InTransaction => VManagementTransaction.Current != null;
         public static string InternalFilesPath
         {
             get

@@ -6,24 +6,20 @@ namespace VManagement.Database.Connection
 {
     public sealed class VManagementCommand
     {
+        private readonly SqlCommand _command;
+
         public string CommandText
         {
             get => _command.CommandText;
             set => _command.CommandText = value;
         }
-        public SqlParameterCollection Parameters
-        {
-            get => _command.Parameters;
-        }
-
-        private readonly SqlCommand _command;
-        private readonly SqlConnection _connection;
 
         internal VManagementCommand(SqlConnection connection)
         {
-            _connection = connection;
-            _command = _connection.CreateCommand();
-            _command.Transaction = VManagementTransaction.CurrentTransaction;
+            _command = connection.CreateCommand();
+
+            if (TransactionScopeManager.Current != null)
+                _command.Transaction = TransactionScopeManager.Current.Transaction;
         }
 
         public void SetParameters(ParameterCollection parameters)
